@@ -22,4 +22,4 @@ val keyMapping: KeyMapping = KeyMapping(
   )
 )
 
-def getAction(key: String): String = keyMapping.keyToAction.getOrElse(key.toLowerCase(), "")
+def keyToAction(key: String): String = keyMapping.keyToAction.getOrElse(key.toLowerCase(), "")
