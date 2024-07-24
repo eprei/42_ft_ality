@@ -33,10 +33,7 @@ object Main {
       Map("Left" -> state1, "Left,[FP]" -> state2, "Left+[FP]" -> state3)
     )
 
-    val keyEventCaptureApp = new KeyEventCapture(automata.transitions)
-    keyEventCaptureApp.main(args)
-    while (true) {
-      Thread.sleep(1000)
-    }
+    val gui = new Gui(automata.transitions)
+    gui.main(args)
   }
 }

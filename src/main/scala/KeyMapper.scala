@@ -1,11 +1,11 @@
-final case class KeyMapping(
+final case class KeyMapper(
     keyToAction: Map[String, String]
 )
 
 // TODO according to the subject:
 // "The key mappings must be automatically computed from the grammar.
 // If they’re hardcoded, I will personally come and break your bones."
-val keyMapping: KeyMapping = KeyMapping(
+val keyMapper: KeyMapper = KeyMapper(
   keyToAction = Map(
     "q" -> "Block",
     "↓" -> "Down",
@@ -22,4 +22,4 @@ val keyMapping: KeyMapping = KeyMapping(
   )
 )
 
-def keyToAction(key: String): String = keyMapping.keyToAction.getOrElse(key.toLowerCase(), "")
+def keyToAction(key: String): Option[String] = keyMapper.keyToAction.get(key.toLowerCase)
