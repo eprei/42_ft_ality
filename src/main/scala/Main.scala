@@ -33,7 +33,13 @@ object Main {
       Map("Left" -> state1, "Left,[FP]" -> state2, "Left+[FP]" -> state3)
     )
 
-    val gui = new Gui(automata.transitions)
+    val gui: Gui = new Gui(automata.transitions)
+    // start the graphical environment
     gui.main(args)
+
+    while (true) {
+      Thread.sleep(1000)
+    }
+
   }
 }

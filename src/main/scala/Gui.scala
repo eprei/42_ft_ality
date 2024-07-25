@@ -1,46 +1,65 @@
 import java.awt.Toolkit
 import scala.swing.*
 import scala.swing.event.*
-import CombinationCalculator._
-import StateUtils._
+import CombinationCalculator.*
+import StateUtils.*
 
-class Gui(transitions: Map[String, State])
-    extends SimpleSwingApplication {
+class Gui(transitions: Map[String, State]) extends SimpleSwingApplication {
   def top: Frame = new MainFrame {
     title = "Mortal Kombat training mode"
 
-    var lastKeyPressedTime = 0L
+    var lastKeyPressedTime: Long = 0L
     var currentCombination: String = ""
 
-    val combinationExecuted: Label = new Label {
-      text = "Press any key..."
-      font = new Font("Arial", java.awt.Font.PLAIN, 24)
+    val movementExecutedTxt: Label = new Label {
+      text = "Movement executed"
+      font = new Font("Arial", java.awt.Font.PLAIN, 15)
+      horizontalAlignment = Alignment.Center
     }
 
-    val detectedMovement: Label = new Label {
-      font = new Font("Arial", java.awt.Font.PLAIN, 24)
+    val movementExecuted: TextArea = new TextArea {
+      text = "Press a sequence of keys to execute a special movement"
+      font = new Font("Arial", java.awt.Font.PLAIN, 15)
+      editable = false
+      lineWrap = true
+      focusable = false
     }
 
-    val panel: BoxPanel = new BoxPanel(Orientation.Vertical) {
-      contents += combinationExecuted
-      contents += detectedMovement
+    val actionExecutedTxt: Label = new Label {
+      text = "Actions"
+      font = new Font("Arial", java.awt.Font.PLAIN, 15)
+      horizontalAlignment = Alignment.Center
+    }
+
+    val actionExecuted: TextArea = new TextArea {
+      val pressableKeys: String = keyMapper.keyToAction.keySet.mkString(" ")
+      text = s"Press\n$pressableKeys"
+      font = new Font("Arial", java.awt.Font.PLAIN, 15)
+      editable = false
+      lineWrap = true
+      focusable = false
+    }
+
+    val panel: GridPanel = new GridPanel(2, 2) {
+      contents += movementExecutedTxt
+      contents += movementExecuted
+      contents += actionExecutedTxt
+      contents += actionExecuted
+
       focusable = true
       requestFocus()
 
       listenTo(keys)
       reactions += { case KeyPressed(_, keyPressed, _, _) =>
         val currentTime: Long = System.currentTimeMillis()
-        val deltaKeystrokes = currentTime - lastKeyPressedTime
+        val deltaKeystrokes: Long = currentTime - lastKeyPressedTime
         val action: Option[String] = keyToAction(keyPressed.toString)
         action.foreach { action =>
-          // Not functional
           currentCombination =
             calculateCombination(action, deltaKeystrokes, currentCombination)
           lastKeyPressedTime = currentTime
-          // Not functional but at some point we have to update the GUI
-          combinationExecuted.text = currentCombination
-          detectedMovement.text =
-            getMovesIfExists(transitions, currentCombination)
+          actionExecuted.text = currentCombination
+          movementExecuted.text = getMovesIfExists(transitions, currentCombination)
         }
       }
     }
@@ -50,19 +69,12 @@ class Gui(transitions: Map[String, State])
     size = new Dimension(800, 800)
     customCenterOnScreen(this)
     def customCenterOnScreen(frame: Frame): Unit = {
-      val screenSize = Toolkit.getDefaultToolkit.getScreenSize
-      val frameSize = frame.size
+      val screenSize: Dimension = Toolkit.getDefaultToolkit.getScreenSize
+      val frameSize: Dimension = frame.size
       frame.location = new Point(
         (screenSize.width - frameSize.width) / 2,
         (screenSize.height - frameSize.height) / 2
       )
-    }
-  }
-
-  override def main(args: Array[String]): Unit = {
-    super.main(args)
-    while (true) {
-      Thread.sleep(1000)
     }
   }
 }

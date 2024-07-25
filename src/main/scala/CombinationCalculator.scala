@@ -4,8 +4,8 @@ object CombinationCalculator {
       deltaKeystrokes: Long,
       currentCombination: String
   ): String = {
-    val sequentialKeyPressInterval = 200
-    val simultaneousKeyPressInterval = 40
+    val sequentialKeyPressInterval: Int = 200
+    val simultaneousKeyPressInterval: Int = 40
 
     if (deltaKeystrokes <= simultaneousKeyPressInterval) {
       s"$currentCombination+$action"

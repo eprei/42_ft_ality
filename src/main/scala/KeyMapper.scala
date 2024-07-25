@@ -7,14 +7,14 @@ final case class KeyMapper(
 // If they’re hardcoded, I will personally come and break your bones."
 val keyMapper: KeyMapper = KeyMapper(
   keyToAction = Map(
-    "q" -> "Block",
-    "↓" -> "Down",
-    "w" -> "Flip Stance",
     "←" -> "Left",
+    "↑" -> "Up",
     "→" -> "Right",
+    "↓" -> "Down",
+    "q" -> "Block",
+    "w" -> "Flip Stance",
     "e" -> "Tag",
     "a" -> "Throw",
-    "↑" -> "Up",
     "s" -> "[BK]",
     "d" -> "[BP]",
     "z" -> "[FK]",
