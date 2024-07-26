@@ -29,11 +29,11 @@ object Main {
       moves = Seq(),
     )
 
-    val automata: Automaton = Automaton(transitions =
-      Map("Left" -> state1, "Left,[FP]" -> state2, "Left+[FP]" -> state3)
-    )
+    // val automata: Automaton = Automaton(transitions =
+    //   Map("Left" -> state1, "Left,[FP]" -> state2, "Left+[FP]" -> state3)
+    // )
 
-    val gui: Gui = new Gui(automata.transitions)
+    val gui: Gui = new Gui(Map("Left" -> state1, "Left,[FP]" -> state2, "Left+[FP]" -> state3))
     // start the graphical environment
     gui.main(args)
 
