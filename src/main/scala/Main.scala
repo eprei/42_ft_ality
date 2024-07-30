@@ -1,4 +1,5 @@
 import java.io.{FileNotFoundException, IOException}
+import cats.syntax.either.*
 
 object Main {
   def main(args: Array[String]): Unit = {
@@ -11,56 +12,70 @@ object Main {
 
       case Right(grammar_path) =>
         println("[+] Loading grammar...")
-        val grammar =
-          try {
-            os.read(grammar_path)
-          } catch {
-            case e: FileNotFoundException =>
-              println(s"ft_ality: error: file not found: $grammar_path")
-              return
-            case e: IOException =>
-              println(s"ft_ality: error: could not open: $grammar_path")
-              return
-          }
 
-        println(grammar)
+        val grammarOrError: Either[Throwable, String] =
+          Either.catchNonFatal(os.read(grammar_path))
 
-        // parsing file
+        val parsedGrammar: Either[Throwable, Grammar] = for {
+          grammarContent <- grammarOrError
+          gram <- YamlParser.parseYaml(grammarContent)
+        } yield gram: Grammar
 
-        // create mapping keys
+        parsedGrammar match {
+          case Left(error) =>
+            error match {
+              case _: FileNotFoundException =>
+                println(s"ft_ality error: file not found: $grammar_path")
+              case _: IOException =>
+                println(s"ft_ality error: could not open: $grammar_path")
+              case _ =>
+                println(s"ft_ality error: ${error.getMessage}")
+            }
 
-        // create automata
-        // TODO get these states during parsing of the grammar file
-        val state3: State = State(
-          number = 2,
-          moves = Seq("Blade Swipe (Baraka)")
-        )
+          case Right(gram: Grammar) =>
+            grammarValidator(gram) match {
+              case Left(error) =>
+                println(s"Syntactic error found in the grammar file: $error")
+                return
+              case Right(actionsAndCombos) => println(actionsAndCombos)
+            }
 
-        val state2: State = State(
-          number = 2,
-          moves = Seq("Dodge hit (Sonya)", "Left punch (Freddy Krueger)")
-        )
+            // TODO: get these states during parsing of the grammar file
+            val state3: State = State(
+              number = 2,
+              moves = Seq("Blade Swipe (Baraka)")
+            )
 
-        val state1: State = State(
-          number = 1,
-          moves = Seq("Fading to the left (Liu-Kang)")
-        )
+            val state2: State = State(
+              number = 2,
+              moves = Seq("Dodge hit (Sonya)", "Left punch (Freddy Krueger)")
+            )
 
-        val state0: State = State(
-          number = 0,
-          moves = Seq()
-        )
+            val state1: State = State(
+              number = 1,
+              moves = Seq("Fading to the left (Liu-Kang)")
+            )
 
-        val automata: Automaton = Automaton(transitions =
-          Map("Left" -> state1, "Left,[FP]" -> state2, "Left+[FP]" -> state3)
-        )
+            val state0: State = State(
+              number = 0,
+              moves = Seq()
+            )
 
-        val gui: Gui = new Gui(automata.transitions)
-        // start the graphical environment
-        gui.main(args)
+            val automata: Automaton = Automaton(transitions =
+              Map(
+                "Left" -> state1,
+                "Left,[FP]" -> state2,
+                "Left+[FP]" -> state3
+              )
+            )
 
-        while (true) {
-          Thread.sleep(1000)
+            val gui: Gui = new Gui(automata.transitions)
+            // start the graphical environment
+            gui.main(args)
+
+            while (true) {
+              Thread.sleep(1000)
+            }
         }
     }
   }

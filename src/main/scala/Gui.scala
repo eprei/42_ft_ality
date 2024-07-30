@@ -11,13 +11,13 @@ class Gui(transitions: Map[String, State]) extends SimpleSwingApplication {
     var lastKeyPressedTime: Long = 0L
     var currentCombination: String = ""
 
-    val movementExecutedTxt: Label = new Label {
+    val comboExecutedTxt: Label = new Label {
       text = "Movement executed"
       font = new Font("Arial", java.awt.Font.PLAIN, 15)
       horizontalAlignment = Alignment.Center
     }
 
-    val movementExecuted: TextArea = new TextArea {
+    val comboExecuted: TextArea = new TextArea {
       text = "Press a sequence of keys to execute a special movement"
       font = new Font("Arial", java.awt.Font.PLAIN, 15)
       editable = false
@@ -41,8 +41,8 @@ class Gui(transitions: Map[String, State]) extends SimpleSwingApplication {
     }
 
     val panel: GridPanel = new GridPanel(2, 2) {
-      contents += movementExecutedTxt
-      contents += movementExecuted
+      contents += comboExecutedTxt
+      contents += comboExecuted
       contents += actionExecutedTxt
       contents += actionExecuted
 
@@ -59,7 +59,7 @@ class Gui(transitions: Map[String, State]) extends SimpleSwingApplication {
             calculateCombination(action, deltaKeystrokes, currentCombination)
           lastKeyPressedTime = currentTime
           actionExecuted.text = currentCombination
-          movementExecuted.text = getMovesIfExists(transitions, currentCombination)
+          comboExecuted.text = getMovesIfExists(transitions, currentCombination)
         }
       }
     }
