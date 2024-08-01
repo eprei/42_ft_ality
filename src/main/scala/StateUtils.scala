@@ -1,5 +1,8 @@
 object StateUtils {
-  def getMovesIfExists(transitions: Map[String, State], currentCombination: String): String = {
-    transitions.get(currentCombination).map(_.getMoves).getOrElse("")
+  def getMovesIfExists(transitions: Map[String, State], currentCombination: String): Seq[String] = {
+    transitions.get(currentCombination) match {
+      case Some(value) => value.getMoves
+      case None => Seq.empty[String]
+    }
   }
 }
