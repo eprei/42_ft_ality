@@ -1,3 +1,4 @@
+import KeyUtils.adaptYamlActionsMapForAutomaton
 import automaton.Automaton
 import cats.syntax.either.*
 import os.Path
@@ -23,13 +24,8 @@ object Main:
     case AppError.ParsingError(error) => println(error)
     case AppError.ValidationError(error) => println(s"Syntactic error found in the grammar file: $error")
 
-  private def adaptActionsMapForAutomaton(inputMap: Map[String, String]): Map[String, Int] =
-    val invertedPairs: Seq[(String, String)] = inputMap.toSeq.map { case (k, v) => (v, k) }
-    val indexedPairs: Seq[(String, Int)] = invertedPairs.zipWithIndex.map { case ((v, _), index) => (v, index) }
-    indexedPairs.toMap
-
   private def trainAutomaton(grammar: Grammar): Automaton =
-    val actionsForAutomaton: Map[String, Int] = adaptActionsMapForAutomaton(grammar.keyMapping)
+    val actionsForAutomaton: Map[String, Int] = adaptYamlActionsMapForAutomaton(grammar.keyMapping)
     val combos: Map[String, String] = grammar.combos
     new Automaton(actionsForAutomaton, combos)
 

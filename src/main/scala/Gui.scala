@@ -2,8 +2,10 @@ import java.awt.Color
 import scala.swing.*
 import scala.swing.event.*
 import CombinationCalculator.*
-import StateUtils.*
+import KeyUtils.{buildStringOfActionsForPrint, getActionIndex}
 import automaton.Automaton
+import automaton.Action
+import global.Global.sequentialKeyPressInterval
 
 import BorderPanel.Position.*
 
@@ -13,6 +15,7 @@ class Gui(automaton: Automaton, grammar: Grammar) extends SimpleSwingApplication
 
     var lastKeyPressedTime: Long = 0L
     var currentCombination: String = ""
+    var seqAction: Seq[Action] = Seq.empty
 
     val instructions: TextArea = new TextArea(){
       text = "\n\t\tTry a combo!\n"
@@ -20,7 +23,8 @@ class Gui(automaton: Automaton, grammar: Grammar) extends SimpleSwingApplication
     }
 
     val comboExecuted: TextArea = new TextArea(){
-      font = new Font("Arial", java.awt.Font.PLAIN, 20)
+      text = "\n\t\there the combos will appear"
+      font = new Font("Arial", java.awt.Font.PLAIN, 16)
       editable = false
       lineWrap = true
       focusable = false
@@ -39,6 +43,7 @@ class Gui(automaton: Automaton, grammar: Grammar) extends SimpleSwingApplication
     }
 
     val actionExecuted: TextArea = new TextArea() {
+      text = ""
       font = new Font("Arial", java.awt.Font.BOLD, 16)
       editable = false
       lineWrap = true
@@ -62,15 +67,15 @@ class Gui(automaton: Automaton, grammar: Grammar) extends SimpleSwingApplication
 
       reactions += { case KeyPressed(_, keyPressed, _, _) =>
         val currentTime: Long = System.currentTimeMillis()
-        val deltaKeystrokes: Long = currentTime - lastKeyPressedTime
-        val action: Option[String] = grammar.keyMapping.get(keyPressed.toString.toLowerCase())
-        action.foreach { action =>
-          // TODO use parsers logic to find the currentCombination and the actionExecuted
-        currentCombination = calculateCombination(action, deltaKeystrokes, currentCombination)
-        lastKeyPressedTime = currentTime
-        actionExecuted.text = "\n\t" + currentCombination + "\n"
-        comboExecuted.text = "\n\there the combos will appear"
-//          comboExecuted.text = "\n" + getMovesIfExists(transitions, currentCombination).map(s => "\t" + s).mkString("\n") + "\n"
+        val isSequentialInterval: Boolean = currentTime - lastKeyPressedTime < sequentialKeyPressInterval
+        val actionIndex: Option[Int] = getActionIndex(grammar.keyMapping, keyPressed.toString.toLowerCase())
+
+        actionIndex.foreach { action =>
+          seqAction = calculateCombination((action, currentTime), isSequentialInterval, seqAction)
+          val combosDetectedByAutomaton: Set[String] = automaton.parse(seqAction)
+          lastKeyPressedTime = currentTime
+          actionExecuted.text = buildStringOfActionsForPrint(grammar, seqAction)
+          comboExecuted.text = "\n\t\t" + combosDetectedByAutomaton.mkString("\n\t\t")
         }
       }
     }

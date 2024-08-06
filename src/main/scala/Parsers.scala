@@ -1,11 +1,12 @@
 package parsers
 
 import automaton.Action
+import global.Global.simultaneousKeyPressInterval
 
 object Parsers:
-    type ParseResult = (Int, Int)
+    // (nb of parsed input actions, timestamp of parsed actions, often latest action)
+    type ParseResult = (Int, Long)
     type Parser = Seq[Action] => Option[ParseResult]
-    val simultaneousKeyPressInterval: Int = 40
 
     def action(id: Int): Parser =
     l => if l.isEmpty || l(0)(0) != id then None else Some(1, l(0)(1))
@@ -28,10 +29,3 @@ object Parsers:
                         case Some((n2, ts2)) => Some(n + n2, ts2)
                         case _ => None
                 case _ => None
-
-
-        
-                        
-            
-
-

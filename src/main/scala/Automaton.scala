@@ -2,7 +2,8 @@ package automaton
 
 import parsers.Parsers.*
 
-type Action = (Int, Int)
+// (id of action, timestamp of action)
+type Action = (Int, Long)
 
 class Automaton(val actions: Map[String, Int], combos: Map[String, String]):
 

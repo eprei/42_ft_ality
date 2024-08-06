@@ -1,16 +1,12 @@
+import global.Global.simultaneousKeyPressInterval
+import global.Global.sequentialKeyPressInterval
+import automaton.Action
+
 object CombinationCalculator {
   def calculateCombination(
-      action: String,
-      deltaKeystrokes: Long,
-      currentCombination: String
-  ): String = {
-    val sequentialKeyPressInterval: Int = 1000
-    val simultaneousKeyPressInterval: Int = 150
-
-    if (deltaKeystrokes <= simultaneousKeyPressInterval) {
-      s"$currentCombination+$action"
-    } else if (deltaKeystrokes > sequentialKeyPressInterval) {
-      action
-    } else { s"$currentCombination,$action" }
-  }
+      action: Action,
+      isSequentialInterval: Boolean,
+      currentCombination: Seq[Action]
+  ): Seq[Action] =
+    if isSequentialInterval then currentCombination :+ action else Seq(action)
 }
