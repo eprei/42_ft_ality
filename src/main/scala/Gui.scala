@@ -20,6 +20,8 @@ class Gui(automaton: Automaton, grammar: Grammar) extends SimpleSwingApplication
     val instructions: TextArea = new TextArea(){
       text = "\n\t\tTry a combo!\n"
       font = new Font("Arial", java.awt.Font.BOLD, 18)
+      editable = false
+      focusable = false
     }
 
     val comboExecuted: TextArea = new TextArea(){
