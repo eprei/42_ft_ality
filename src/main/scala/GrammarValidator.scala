@@ -8,8 +8,8 @@ object GrammarValidator:
     else Right(grammar)
 
   private def isValidKey(key: String): Boolean =
-    val validArrows = Set("←", "→", "↑", "↓")
-    key.length == 1 && key.forall(_.isLetterOrDigit) || validArrows.contains(key)
+    val specialCharacters = Set("←", "→", "↑", "↓", "left", "right", "up", "down")
+    key.length == 1 && key.forall(_.isLetterOrDigit) || specialCharacters.contains(key)
 
   private def isValidCombo(combo: String, allActions: Iterable[String]): Boolean =
     combo.split(Array(',', '+')).forall(allActions.toSet.contains)
