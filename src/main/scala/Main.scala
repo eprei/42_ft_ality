@@ -1,67 +1,37 @@
-import java.io.{FileNotFoundException, IOException}
+import KeyUtils.adaptYamlActionsMapForAutomaton
+import automaton.Automaton
+import cats.syntax.either.*
+import os.Path
 
-object Main {
-  def main(args: Array[String]): Unit = {
-    parse_args(args) match {
-      case Left(ParseArgsError.Help) =>
-        print_help()
+object Main:
+  def main(args: Array[String]): Unit =
+    parseArgsAndLoadGrammar(args) match
+      case Left(error) => handleError(error)
+      case Right(grammar) => launchGui(trainAutomaton(grammar), grammar, args)
 
-      case Left(ParseArgsError.InvalidNumberOfArgs) =>
-        println("usage: ft_ality [-h] grammarFile")
+  private def parseArgsAndLoadGrammar(args: Array[String]): Either[AppError, Grammar] =
+    for
+      grammarPath: Path <- parseArgs(args)
+      grammarContent: String <- Either.catchNonFatal(os.read(grammarPath)).leftMap(AppError.IOError)
+      parsedGrammar: Grammar <- YamlParser.parseYaml(grammarContent).leftMap(AppError.ParsingError)
+      validatedGrammar: Grammar <- GrammarValidator.validate(parsedGrammar).leftMap(AppError.ValidationError)
+    yield validatedGrammar
 
-      case Right(grammar_path) =>
-        println("[+] Loading grammar...")
-        val grammar =
-          try {
-            os.read(grammar_path)
-          } catch {
-            case e: FileNotFoundException =>
-              println(s"ft_ality: error: file not found: $grammar_path")
-              return
-            case e: IOException =>
-              println(s"ft_ality: error: could not open: $grammar_path")
-              return
-          }
+  private def handleError(error: AppError): Unit = error match
+    case AppError.Help => print_help()
+    case AppError.InvalidArguments => println("usage: ft_ality [-h] grammarFile")
+    case AppError.IOError(error) => println(error)
+    case AppError.ParsingError(error) => println(error)
+    case AppError.ValidationError(error) => println(s"Syntactic error found in the grammar file: $error")
 
-        println(grammar)
+  private def trainAutomaton(grammar: Grammar): Automaton =
+    val actionsForAutomaton: Map[String, Int] = adaptYamlActionsMapForAutomaton(grammar.keyMapping)
+    val combos: Map[String, String] = grammar.combos
+    new Automaton(actionsForAutomaton, combos)
 
-        // parsing file
-
-        // create mapping keys
-
-        // create automata
-        // TODO get these states during parsing of the grammar file
-        val state3: State = State(
-          number = 2,
-          moves = Seq("Blade Swipe (Baraka)")
-        )
-
-        val state2: State = State(
-          number = 2,
-          moves = Seq("Dodge hit (Sonya)", "Left punch (Freddy Krueger)")
-        )
-
-        val state1: State = State(
-          number = 1,
-          moves = Seq("Fading to the left (Liu-Kang)")
-        )
-
-        val state0: State = State(
-          number = 0,
-          moves = Seq()
-        )
-
-        val automata: Automaton = Automaton(transitions =
-          Map("Left" -> state1, "Left,[FP]" -> state2, "Left+[FP]" -> state3)
-        )
-
-        val gui: Gui = new Gui(automata.transitions)
-        // start the graphical environment
-        gui.main(args)
-
-        while (true) {
-          Thread.sleep(1000)
-        }
-    }
-  }
-}
+  private def launchGui(automaton: Automaton, grammar: Grammar, args: Array[String]): Unit =
+    val gui = new Gui(automaton, grammar)
+    gui.main(args)
+    while (true)
+      Thread.sleep(1000)
+  

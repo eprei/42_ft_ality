@@ -8,7 +8,10 @@ lazy val root = (project in file("."))
 
     libraryDependencies ++= Seq(
       "org.scala-lang.modules" %% "scala-swing" % "3.0.0",
-      "com.lihaoyi" %% "os-lib" % "0.10.1"
+      "com.lihaoyi" %% "os-lib" % "0.10.1",
+      "io.circe" %% "circe-yaml" % "1.15.0",
+       "io.circe" %% "circe-generic" % "0.14.7",
+       "io.circe" %% "circe-parser" % "0.14.9"
     )
   )
 

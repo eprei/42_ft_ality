@@ -1,15 +1,12 @@
 import os.RelPath
 
-enum ParseArgsError:
-  case Help, InvalidNumberOfArgs
-
-def parse_args(args: Seq[String]): Either[ParseArgsError, os.Path] =
+def parseArgs(args: Seq[String]): Either[AppError, os.Path] =
   if args.contains("-h") || args.contains("--help") then
-    Left(ParseArgsError.Help)
+    Left(AppError.Help)
   else
     args.size match
       case 1 => Right(os.pwd / RelPath(args.head))
-      case _ => Left(ParseArgsError.InvalidNumberOfArgs)
+      case _ => Left(AppError.InvalidArguments)
 
 def print_help(): Unit =
   println("""usage: ft_ality [-h] grammarFile
