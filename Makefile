@@ -1,6 +1,9 @@
 # Scala Build Tool
 SBT = sbt
 
+# Grammar file
+GRAMMAR = grammars/mk9.yml
+
 all: run
 
 clean:
@@ -13,7 +16,7 @@ compile:
 
 run:
 	@echo run
-	@$(SBT) run
+	@$(SBT) "run $(GRAMMAR)"
 
 re:	clean compile
 
