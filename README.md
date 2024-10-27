@@ -43,11 +43,7 @@ FT_ALITY is a project that recreates a fighting game's training mode by implemen
 
 ### Installation
 
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd ft_ality
-```
+1. Clone the repository
 
 2. Build the project:
 ```bash
